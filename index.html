@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Dacă ai pictograma, o va încărca; dacă nu, nu va da eroare vizibilă -->
+    <link rel="icon" type="image/png" href="b2b_sales.png">
+    <title>Tracker Colaboratori Enablers</title>
+
+    <style>
+        /* Stilizare tabel modern pe care ai cerut-o */
+        .table-responsive {
+            border-radius: 12px;
+            border: 1px solid #eef2f5;
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.80rem;
+            letter-spacing: 0.8px;
+            border-bottom: 2px solid #e9ecef;
+            padding: 16px;
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+            padding: 16px;
+            color: #495057;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Fundal pagina */
+        body {
+            background-color: #FAFAFA !important;
+        }
+        
+        /* O mică ajustare pentru checkbox să arate aliniat cu restul textelor */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            padding-top: 30px; /* Îl aliniază cu input-urile care au label deasupra */
+        }
+    </style>
+
+    <script>
+        // Logica ta de protejare a paginii
+        const vipToken = localStorage.getItem('tokenAuth');
+        console.log("Valoarea token-ului găsită:", vipToken);
+
+        if (!vipToken || vipToken === 'undefined' || vipToken === 'null') {
+            console.log("Acces refuzat. Redirecționez...");
+            // window.location.href = '/login.html'; // Decomentează asta când ai pagina de login gata
+        } else {
+            console.log("Acces permis.");
+        }
+    </script>
+
+    <!-- Includem Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    
+<div class="container mt-2">
+    <!-- Bara info de sus -->
+    <div class="alert alert-info shadow-sm mb-4">
+        Logat ca: <strong id="emailUtilizator">Se încarcă...</strong>
+    </div>
+
+    <h2 class="text-center mb-4 text-primary">Tracker Colaboratori Enablers</h2>
+    
+    <!-- Secțiunea pentru formularul de adăugare date -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-body p-4">
+            <h5 class="card-title mb-4">Adaugă un colaborator nou</h5>
+            
+            <form id="formularColaboratori">
+                <input type="hidden" id="colaboratorId" value="">
+                
+                <div class="row g-3">
+                    <!-- Rândul 1 -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Numele colaboratorilor</label>
+                        <input type="text" class="form-control" id="nume" required placeholder="Ex: hah">
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">SDG Proiect</label>
+                        <select class="form-select" id="sdgProiect" required>
+                            <option value="">Alege...</option>
+                            <option value="heartbeat">heartbeat</option>
+                            <option value="fingerprint">fingerprint</option>
+                            <option value="global classroom">global classroom</option>
+                            <option value="youth 4 impact">youth 4 impact</option>
+                            <!-- Poți adăuga și restul proiectelor tale aici -->
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Reminder Feedback</label>
+                        <input type="date" class="form-control" id="reminder">
+                    </div>
+
+                    <!-- Rândul 2 -->
+                    <div class="col-md-5">
+                        <label class="form-label fw-bold">Postări publicate</label>
+                        <input type="text" class="form-control" id="postari" placeholder="Ex: FB, IG story">
+                    </div>
+
+                    <div class="col-md-5">
+                        <label class="form-label fw-bold">Feedback colaboratori</label>
+                        <input type="text" class="form-control" id="feedback" placeholder="Ex: Așteaptă raport final">
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="checkbox-container form-check">
+                            <input type="checkbox" class="form-check-input" id="contactat" style="transform: scale(1.3); margin-top: 0.2rem;">
+                            <label class="form-check-label fw-bold ms-1" for="contactat">Contactat</label>
+                        </div>
+                    </div>
+
+                    <!-- Rândul 3 -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Dorințele colaboratorilor</label>
+                        <textarea class="form-control" id="dorinte" rows="2" placeholder="Ex: Vizibilitate pe social media..."></textarea>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Ideea principală a proiectului</label>
+                        <textarea class="form-control" id="ideea" rows="2" placeholder="Ex: Workshop-uri..."></textarea>
+                    </div>
+
+                    <!-- Buton Submit -->
+                    <div class="col-12 text-end mt-4">
+                        <button type="submit" class="btn btn-primary px-4">Salvează Colaboratorul</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Secțiunea unde se afișează datele (Tabelul) -->
+    <h4 class="mb-3">Lista Colaboratorilor Contactați</h4>
+    <div class="table-responsive bg-white shadow-sm rounded mb-5">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Nume</th>
+                    <th>Contactat</th>
+                    <th>Proiect</th>
+                    <th>Dorințe</th>
+                    <th>Postări</th>
+                    <th>Feedback</th>
+                    <th>Reminder</th>
+                </tr>
+            </thead>
+            <tbody id="tabelDate">
+                <!-- Aici va apărea codul tău mai târziu, momentan e un exemplu static -->
+                <tr>
+                    <td><strong>hah</strong></td>
+                    <td><span class="badge bg-success">Da</span></td>
+                    <td><span class="badge bg-danger">heartbeat</span></td>
+                    <td>Să aibă vizibilitate...</td>
+                    <td>Postare lansare FB</td>
+                    <td>Așteaptă raportul...</td>
+                    <td>24.07.2026</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Logica pentru afișarea email-ului din tokenul JWT 
+    const token = localStorage.getItem('tokenAuth');
+    if (token && token !== 'undefined' && token !== 'null') {
+        try {
+            const baza64Url = token.split('.')[1];
+            const baza64 = baza64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const dateUtilizator = JSON.parse(window.atob(baza64));
+            
+            document.getElementById('emailUtilizator').innerText = dateUtilizator.email || "Utilizator recunoscut";
+        } catch (e) {
+            document.getElementById('emailUtilizator').innerText = "Eroare citire token";
+        }
+    } else {
+        document.getElementById('emailUtilizator').innerText = "Vizitator (Nelogat)";
+    }
+</script>
+
+<!-- Conectăm logica noastră JavaScript principală -->
+<script src="script.js"></script>
+</body>
+</html>
