@@ -13,10 +13,14 @@ app.use(express.json());
 // Configurăm conexiunea la baza de date MySQL
 // ATENȚIE: Aici va trebui să modifici cu datele tale reale!
 const db = mysql.createConnection({
-    host: 'localhost',         // Adresa bazei de date (pe același calculator)
-    user: 'root',              // Utilizatorul implicit
-    password: '2503',              // Pune parola ta aici (sau lasă gol dacă folosești XAMPP default)
-    database: 'tracker_db'    // IMPORTANT: Pune numele bazei tale de date aici!
+   host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    ssl: {
+        rejectUnauthorized: false // Necesită o conexiune securizată (obligatoriu pentru Aiven)
+    } 
 });
 
 // Verificăm dacă ne-am conectat cu succes la MySQL
@@ -29,7 +33,7 @@ db.connect((eroare) => {
 });
 
 // Creăm ruta care primește datele de la frontend (corespunde cu fetch-ul din script.js)
-app.post('/api/colaboratori', (req, res) => {
+app.post('/', (req, res) => {
     // Extragem datele primite din frontend
     const dateFrontend = req.body;
 
@@ -55,12 +59,12 @@ app.post('/api/colaboratori', (req, res) => {
     db.query(sql, valori, (eroare, rezultat) => {
         if (eroare) {
             console.error('Eroare la inserarea datelor:', eroare);
-            // Trimitem un mesaj de eroare înapoi către browser
-            return res.status(500).json({ mesaj: "Eroare la salvarea în baza de date" });
+        // Returnăm și mesajul tehnic detaliat (eroare.message) către browser
+        return res.status(500).json({ 
+            mesaj: "Eroare la salvarea în baza de date",
+            detalii_tehnice: eroare.message
         }
-        
         console.log('Un nou colaborator a fost adăugat cu succes!');
-        // Trimitem confirmarea de succes către browser
         res.status(200).json({ mesaj: "Colaboratorul a fost salvat cu succes!" });
     });
 });
