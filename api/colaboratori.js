@@ -77,5 +77,41 @@ app.get('/api/colaboratori', (req, res) => {
         res.status(200).json(rezultate);
     });
 });
+// Ruta pentru ȘTERGERE (DELETE)
+app.delete('/api/colaboratori/:id', (req, res) => {
+    const id = req.params.id; // Extragem ID-ul din adresa URL
+    const sql = 'DELETE FROM colaboratori WHERE id = ?';
+    
+    db.query(sql, [id], (eroare, rezultat) => {
+        if (eroare) {
+            console.error('Eroare la ștergere:', eroare);
+            return res.status(500).json({ mesaj: "Eroare internă", detalii: eroare.message });
+        }
+        res.status(200).json({ mesaj: "Colaborator șters cu succes!" });
+    });
+});
+
+// Ruta pentru EDITARE (PUT)
+app.put('/api/colaboratori/:id', (req, res) => {
+    const id = req.params.id;
+    const date = req.body;
+    
+    const sql = `UPDATE colaboratori 
+                 SET nume=?, sdg_proiect=?, reminder_feedback=?, postari_publicate=?, feedback_colaboratori=?, contactat=?, dorinte=?, ideea_principala=? 
+                 WHERE id=?`;
+                 
+    const valori = [
+        date.nume, date.sdgProiect, date.reminder || null, date.postari, 
+        date.feedback, date.contactat, date.dorinte, date.ideea, id
+    ];
+    
+    db.query(sql, valori, (eroare, rezultat) => {
+        if (eroare) {
+            console.error('Eroare la actualizare:', eroare);
+            return res.status(500).json({ mesaj: "Eroare la actualizare", detalii: eroare.message });
+        }
+        res.status(200).json({ mesaj: "Actualizat cu succes!" });
+    });
+});
 // Exportăm aplicația pentru funcțiile Serverless Vercel
 module.exports = app;

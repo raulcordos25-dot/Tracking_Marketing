@@ -1,17 +1,16 @@
-// 1. Localizăm formularul și butonul din HTML
 const formular = document.getElementById('formularColaboratori');
 const butonSalvare = formular.querySelector('button[type="submit"]');
+const idAscuns = document.getElementById('colaboratorId'); // Câmpul tău hidden din HTML
 
-// 2. Folosim "onsubmit" în loc de "addEventListener" pentru a garanta o execuție unică
+// Salvăm datele temporar în memorie pentru a le putea introduce ușor în formular când dăm "Editează"
+let listaGlobalaColaboratori = []; 
+
+// --- 1. LOGICA PENTRU TRIMITEREA FORMULARULUI (POST sau PUT) ---
 formular.onsubmit = async function(eveniment) {
-    // Oprim reîncărcarea paginii
     eveniment.preventDefault();
-
-    // 3. DEZACTIVĂM butonul pe durata procesării pentru a preveni spam-ul/dublu-click-ul
     butonSalvare.disabled = true;
-    butonSalvare.innerText = "Se salvează..."; // Oferim feedback vizual utilizatorului
+    butonSalvare.innerText = "Se procesează...";
 
-    // Colectăm datele
     const dateColaborator = {
         nume: document.getElementById('nume').value,
         sdgProiect: document.getElementById('sdgProiect').value,
@@ -23,90 +22,137 @@ formular.onsubmit = async function(eveniment) {
         ideea: document.getElementById('ideea').value
     };
 
+    const metoda = idAscuns.value ? 'PUT' : 'POST';
+    const url = idAscuns.value ? `/api/colaboratori/${idAscuns.value}` : '/api/colaboratori';
+
     try {
-        // Trimitem datele către serverul nostru de pe Vercel
-        const raspuns = await fetch('/api/colaboratori', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+        const raspuns = await fetch(url, {
+            method: metoda,
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dateColaborator)
         });
 
         if (raspuns.ok) {
-            alert('Colaboratorul a fost salvat cu succes în baza de date!');
-            await incarcaColaboratori(); // Reîncarcă tabelul instant
-            formular.reset(); // Curățăm formularul pentru o nouă introducere
+            alert(idAscuns.value ? 'Actualizat cu succes!' : 'Salvat cu succes!');
+            
+            // Resetăm formularul la starea inițială (modul Creare)
+            formular.reset();
+            idAscuns.value = '';
+            butonSalvare.classList.replace('btn-warning', 'btn-primary');
+            
+            await incarcaColaboratori();
         } else {
-            alert('A apărut o problemă la salvarea datelor.');
+            alert('Eroare la comunicarea cu baza de date.');
         }
-
     } catch (eroare) {
-        console.error('Eroare de conexiune cu serverul:', eroare);
-        alert('Nu m-am putut conecta la server.');
+        console.error('Eroare:', eroare);
     } finally {
-        // 4. Blocul "finally" se execută MEREU la final, indiferent dacă a fost succes sau eroare.
-        // Reactivăm butonul ca să poți adăuga un alt colaborator.
         butonSalvare.disabled = false;
         butonSalvare.innerText = "Salvează Colaboratorul";
     }
 };
-// Funcție separată care aduce datele și le afișează în tabel
+
+// --- 2. LOGICA PENTRU CITIRE (GET) ȘI CONSTRUIRE TABEL ---
 async function incarcaColaboratori() {
     try {
-        // Cerem datele de la server
         const raspuns = await fetch('/api/colaboratori');
-        const colaboratori = await raspuns.json();
-
-        // Găsim corpul tabelului în HTML
+        listaGlobalaColaboratori = await raspuns.json(); // Salvăm lista global
         const tabel = document.getElementById('tabelDate');
-        
-        // Curățăm tabelul (ștergem datele vechi sau rândurile statice demonstrative)
         tabel.innerHTML = '';
 
-        // Luăm fiecare colaborator și îi creăm un rând HTML
-        colaboratori.forEach(colab => {
+        listaGlobalaColaboratori.forEach(colab => {
             const rand = document.createElement('tr');
-            
-            // Formatăm vizual bifa de Contactat (Da sau Nu)
             const textContactat = colab.contactat ? 'Da' : 'Nu';
             const clasaContactat = colab.contactat ? 'bg-success' : 'bg-secondary';
-let dataReminderFormatata = '-';
-let clasaCuloareData = ''; 
-if (colab.reminder_feedback) {
-    const dataObj = new Date(colab.reminder_feedback);
-    dataReminderFormatata = dataObj.toLocaleDateString('ro-RO');
+            
+            let dataReminderFormatata = '-';
+            let clasaCuloareData = ''; 
 
-    // Preluăm data de azi
-    const azi = new Date();
-    
-    // Resetăm orele la 00:00:00 pentru o comparație corectă strict pe zile
-    azi.setHours(0, 0, 0, 0);
-    const dataComparare = new Date(dataObj);
-    dataComparare.setHours(0, 0, 0, 0);
+            if (colab.reminder_feedback) {
+                const dataObj = new Date(colab.reminder_feedback);
+                dataReminderFormatata = dataObj.toLocaleDateString('ro-RO');
+                
+                const azi = new Date();
+                const dataAziFormatata = azi.toLocaleDateString('ro-RO');
+                azi.setHours(0, 0, 0, 0);
+                
+                const dataComparare = new Date(dataObj);
+                dataComparare.setHours(0, 0, 0, 0);
 
-    // Aplicăm regulile de culoare
-    if (dataComparare.getTime() === azi.getTime()) {
-        clasaCuloareData = 'bg-warning text-dark fw-bold'; // Azi -> Galben
-    } else if (dataComparare.getTime() < azi.getTime()) {
-        clasaCuloareData = 'bg-danger text-dark fw-bold'; // Trecut -> Roșu
-    }
-}
- rand.innerHTML = `
-                <td>${colab.nume}</td>
-                <td><span class="badge ${clasaContactat}">${textContactat}</span></td>
-                <td>${colab.sdg_proiect}</td>
-                <td>${colab.dorinte || '-'}</td>
-                <td>${colab.postari_publicate || '-'}</td>
-                <td>${colab.feedback_colaboratori || '-'}</td>
-                <td class="${clasaCuloareData}">${dataReminderFormatata}</td>
+                if (dataReminderFormatata === dataAziFormatata) {
+                    clasaCuloareData = 'bg-warning text-dark fw-bold';
+                } else if (dataComparare < azi) {
+                    clasaCuloareData = 'bg-danger text-white fw-bold'; 
+                }
+            }
+
+            // Am adăugat coloana cu cele două butoane noi (Editează și Șterge) care apelează funcțiile de mai jos
+            rand.innerHTML = `
+                ${colab.nume}
+                ${textContactat}
+                ${colab.sdg_proiect}
+                ${colab.dorinte || '-'}
+                ${colab.postari_publicate || '-'}
+                ${colab.feedback_colaboratori || '-'}
+                ${dataReminderFormatata}
+                
+                    Editează
+                    Șterge
+                
             `;
             tabel.appendChild(rand);
         });
     } catch (eroare) {
-        console.error('Eroare la aducerea colaboratorilor:', eroare);
+        console.error('Eroare:', eroare);
     }
 }
 
-// Apelăm funcția automat când vizitatorul intră pe pagină
+// --- 3. LOGICA PENTRU EDITARE ---
+// Această funcție este chemată direct din butonul "Editează" din tabel
+window.editeazaColaborator = function(id) {
+    // Căutăm colaboratorul în lista descărcată anterior
+    const colab = listaGlobalaColaboratori.find(c => c.id === id);
+    if (!colab) return;
+
+    // Introducem datele înapoi în formular
+    idAscuns.value = colab.id; // Secretul care îi spune serverului că edităm, nu creăm
+    document.getElementById('nume').value = colab.nume;
+    document.getElementById('sdgProiect').value = colab.sdg_proiect;
+    document.getElementById('postari').value = colab.postari_publicate || '';
+    document.getElementById('feedback').value = colab.feedback_colaboratori || '';
+    document.getElementById('contactat').checked = !!colab.contactat;
+    document.getElementById('dorinte').value = colab.dorinte || '';
+    document.getElementById('ideea').value = colab.ideea_principala || '';
+
+    // Inputul de tip "date" acceptă strict formatul YYYY-MM-DD
+    if (colab.reminder_feedback) {
+        const d = new Date(colab.reminder_feedback);
+        document.getElementById('reminder').value = d.toISOString().split('T')[0];
+    } else {
+        document.getElementById('reminder').value = '';
+    }
+
+    // Semnalizăm vizual că am intrat în modul Editare
+    butonSalvare.innerText = "Actualizează Colaboratorul";
+    butonSalvare.classList.replace('btn-primary', 'btn-warning');
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Ducem vizitatorul înapoi sus la formular
+};
+
+// --- 4. LOGICA PENTRU ȘTERGERE ---
+window.stergeColaborator = async function(id) {
+    // Măsură de siguranță pentru a preveni ștergerile accidentale
+    if (!confirm('Ești sigur că vrei să ștergi definitiv acest colaborator?')) return;
+
+    try {
+        const raspuns = await fetch(`/api/colaboratori/${id}`, { method: 'DELETE' });
+        if (raspuns.ok) {
+            await incarcaColaboratori(); // Reîmprospătăm tabelul
+        } else {
+            alert('Nu am putut șterge colaboratorul.');
+        }
+    } catch (eroare) {
+        console.error('Eroare la ștergere:', eroare);
+    }
+};
+
 incarcaColaboratori();
