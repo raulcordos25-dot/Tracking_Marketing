@@ -146,7 +146,7 @@ window.stergeColaborator = async function(id) {
     if (!confirm('Ești sigur că vrei să ștergi definitiv acest colaborator?')) return;
 
     try {
-        const raspuns = await fetch(`/api/colaboratori/${id}`, { method: 'DELETE' });
+        const raspuns = await fetch(`/api/colaboratori?id=${id}`, { method: 'DELETE' });
         if (raspuns.ok) {
             await incarcaColaboratori(); // Reîmprospătăm tabelul
         } else {
