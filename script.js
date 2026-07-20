@@ -81,17 +81,15 @@ async function incarcaColaboratori() {
 
             // Introducem structura HTML exactă în rândul nostru
            // Introducem structura HTML exactă în rândul nostru, cu  pentru fiecare coloană
-rand.innerHTML = `
-    ${colab.nume}
-    ${textContactat}
-    ${colab.sdg_proiect}
-    ${colab.dorinte || '-'}
-    ${colab.postari_publicate || '-'}
-    ${colab.feedback_colaboratori || '-'}
-    ${dataReminderFormatata}
-`;
-            
-            // Adăugăm rândul finalizat în tabelul vizual
+ rand.innerHTML = `
+                <td>${colab.nume}</td>
+                <td><span class="badge ${clasaContactat}">${textContactat}</span></td>
+                <td>${colab.sdg_proiect}</td>
+                <td>${colab.dorinte || '-'}</td>
+                <td>${colab.postari_publicate || '-'}</td>
+                <td>${colab.feedback_colaboratori || '-'}</td>
+                <td>${dataReminderFormatata}</td>
+            `;
             tabel.appendChild(rand);
         });
     } catch (eroare) {
