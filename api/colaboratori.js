@@ -78,8 +78,8 @@ app.get('/api/colaboratori', (req, res) => {
     });
 });
 // Ruta pentru ȘTERGERE (DELETE)
-app.delete('/api/colaboratori/:id', (req, res) => {
-    const id = req.params.id; // Extragem ID-ul din adresa URL
+app.delete('/api/colaboratori', (req, res) => {
+    const id = req.query.id; // Modificare aici
     const sql = 'DELETE FROM colaboratori WHERE id = ?';
     
     db.query(sql, [id], (eroare, rezultat) => {
@@ -92,8 +92,8 @@ app.delete('/api/colaboratori/:id', (req, res) => {
 });
 
 // Ruta pentru EDITARE (PUT)
-app.put('/api/colaboratori/:id', (req, res) => {
-    const id = req.params.id;
+app.put('/api/colaboratori', (req, res) => {
+    const id = req.body.id; // Modificare aici: extragem ID-ul din body
     const date = req.body;
     
     const sql = `UPDATE colaboratori 

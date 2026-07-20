@@ -12,6 +12,7 @@ formular.onsubmit = async function(eveniment) {
     butonSalvare.innerText = "Se procesează...";
 
     const dateColaborator = {
+        id: idAscuns.value, // Transmitem ID-ul către server pentru a ști ce rând să editeze
         nume: document.getElementById('nume').value,
         sdgProiect: document.getElementById('sdgProiect').value,
         reminder: document.getElementById('reminder').value,
@@ -23,7 +24,8 @@ formular.onsubmit = async function(eveniment) {
     };
 
     const metoda = idAscuns.value ? 'PUT' : 'POST';
-    const url = idAscuns.value ? `/api/colaboratori/${idAscuns.value}` : '/api/colaboratori';
+    const url = '/api/colaboratori'; 
+
 
     try {
         const raspuns = await fetch(url, {
