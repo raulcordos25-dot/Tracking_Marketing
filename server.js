@@ -66,7 +66,13 @@ app.post('/api/colaboratori', (req, res) => {
 });
 
 // Pornim serverul să asculte pe portul 3000
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Serverul Node.js a pornit și ascultă pe adresa http://localhost:${PORT}`);
-});
+// Dacă rulăm local, pornim serverul normal. Dacă rulăm pe Vercel, doar exportăm aplicația.
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = 3000;
+    app.listen(PORT, () => {
+        console.log(`Server local pornit pe http://localhost:${PORT}`);
+    });
+}
+
+// Exportăm aplicația pentru funcțiile Serverless de la Vercel
+module.exports = app;

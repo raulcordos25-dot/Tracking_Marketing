@@ -42,7 +42,7 @@ formular.addEventListener('submit', async function(eveniment) {
     try {
         // 2. Trimitem datele către server folosind funcția 'fetch'
         // 'http://localhost:3000/api/colaboratori' este adresa viitorului nostru server Node.js
-        const raspuns = await fetch('http://localhost:3000/api/colaboratori', {
+       const raspuns = await fetch('/api/colaboratori', {
             method: 'POST', // POST înseamnă că vrem să trimitem/creăm date noi
             headers: {
                 'Content-Type': 'application/json' // Îi spunem serverului că îi trimitem date formatate ca JSON
