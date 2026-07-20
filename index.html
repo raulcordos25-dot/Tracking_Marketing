@@ -71,7 +71,7 @@
 <div class="container mt-2">
     <!-- Bara info de sus -->
     <div class="alert alert-info shadow-sm mb-4">
-        Logat ca: <strong id="emailUtilizator">Se încarcă...</strong>
+        Logat ca: <strong id="emailUtilizator">Alexandra Hordau</strong>
     </div>
 
     <h2 class="text-center mb-4 text-primary">Tracker Colaboratori Enablers</h2>
@@ -99,7 +99,7 @@
                             <option value="fingerprint">fingerprint</option>
                             <option value="global classroom">global classroom</option>
                             <option value="youth 4 impact">youth 4 impact</option>
-                            <!-- Poți adăuga și restul proiectelor tale aici -->
+                            
                         </select>
                     </div>
 
@@ -176,25 +176,6 @@
         </table>
     </div>
 </div>
-
-<script>
-    // Logica pentru afișarea email-ului din tokenul JWT 
-    const token = localStorage.getItem('tokenAuth');
-    if (token && token !== 'undefined' && token !== 'null') {
-        try {
-            const baza64Url = token.split('.')[1];
-            const baza64 = baza64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const dateUtilizator = JSON.parse(window.atob(baza64));
-            
-            document.getElementById('emailUtilizator').innerText = dateUtilizator.email || "Utilizator recunoscut";
-        } catch (e) {
-            document.getElementById('emailUtilizator').innerText = "Eroare citire token";
-        }
-    } else {
-        document.getElementById('emailUtilizator').innerText = "Vizitator (Nelogat)";
-    }
-</script>
-
 <!-- Conectăm logica noastră JavaScript principală -->
 <script src="script.js"></script>
 </body>
