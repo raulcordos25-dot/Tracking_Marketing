@@ -33,7 +33,7 @@ db.connect((eroare) => {
 });
 
 // Creăm ruta care primește datele de la frontend (corespunde cu fetch-ul din script.js)
-app.post('/', (req, res) => {
+app.post('/api/colaboratori', (req, res) => {
     // Extragem datele primite din frontend
     const dateFrontend = req.body;
 
