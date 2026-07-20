@@ -71,12 +71,8 @@ async function incarcaColaboratori() {
             // Formatăm vizual bifa de Contactat (Da sau Nu)
             const textContactat = colab.contactat ? 'Da' : 'Nu';
             const clasaContactat = colab.contactat ? 'bg-success' : 'bg-secondary';
-            
-            // Dacă avem o dată pentru reminder, o facem să arate frumos
-            // Dacă avem o dată pentru reminder, o formatăm și verificăm statusul ei
 let dataReminderFormatata = '-';
-let clasaCuloareData = ''; // Variabilă pentru culoarea de fundal a celulei
-
+let clasaCuloareData = ''; 
 if (colab.reminder_feedback) {
     const dataObj = new Date(colab.reminder_feedback);
     dataReminderFormatata = dataObj.toLocaleDateString('ro-RO');
@@ -91,9 +87,9 @@ if (colab.reminder_feedback) {
 
     // Aplicăm regulile de culoare
     if (dataComparare.getTime() === azi.getTime()) {
-        clasaCuloareData = 'table-warning text-dark fw-bold'; // Azi -> Galben
+        clasaCuloareData = 'bg-warning text-dark fw-bold'; // Azi -> Galben
     } else if (dataComparare.getTime() < azi.getTime()) {
-        clasaCuloareData = 'table-danger text-dark fw-bold'; // Trecut -> Roșu
+        clasaCuloareData = 'bg-danger text-dark fw-bold'; // Trecut -> Roșu
     }
 }
  rand.innerHTML = `
@@ -103,7 +99,7 @@ if (colab.reminder_feedback) {
                 <td>${colab.dorinte || '-'}</td>
                 <td>${colab.postari_publicate || '-'}</td>
                 <td>${colab.feedback_colaboratori || '-'}</td>
-                <td>${dataReminderFormatata}</td>
+                <td class="${clasaCuloareData}">${dataReminderFormatata}</td>
             `;
             tabel.appendChild(rand);
         });
