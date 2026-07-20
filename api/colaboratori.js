@@ -63,6 +63,19 @@ if (process.env.NODE_ENV !== 'production') {
         console.log(`Server local pornit pe http://localhost:${PORT}`);
     });
 }
+// Ruta pentru extragerea datelor (citire)
+app.get('/api/colaboratori', (req, res) => {
+    // Comanda SQL: Selectează tot (*) din tabel și ordonează după ID descrescător (cel mai nou primul)
+    const sql = 'SELECT * FROM colaboratori ORDER BY id DESC';
 
+    db.query(sql, (eroare, rezultate) => {
+        if (eroare) {
+            console.error('Eroare extragere date:', eroare);
+            return res.status(500).json({ mesaj: "Nu am putut încărca datele." });
+        }
+        // Trimitem lista de colaboratori înapoi către site
+        res.status(200).json(rezultate);
+    });
+});
 // Exportăm aplicația pentru funcțiile Serverless Vercel
 module.exports = app;
