@@ -88,17 +88,17 @@ async function incarcaColaboratori() {
 
             // Am adăugat coloana cu cele două butoane noi (Editează și Șterge) care apelează funcțiile de mai jos
             rand.innerHTML = `
-                ${colab.nume}
-                ${textContactat}
-                ${colab.sdg_proiect}
-                ${colab.dorinte || '-'}
-                ${colab.postari_publicate || '-'}
-                ${colab.feedback_colaboratori || '-'}
-                ${dataReminderFormatata}
-                
-                    Editează
-                    Șterge
-                
+               <td>${colab.nume}</td>
+                <td><span class="badge ${clasaContactat}">${textContactat}</span></td>
+                <td>${colab.sdg_proiect}</td>
+                <td>${colab.dorinte || '-'}</td>
+                <td>${colab.postari_publicate || '-'}</td>
+                <td>${colab.feedback_colaboratori || '-'}</td>
+                <td class="${clasaCuloareData}">${dataReminderFormatata}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="editeazaColaborator(${colab.id})">Editează</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="stergeColaborator(${colab.id})">Șterge</button>
+                </td>
             `;
             tabel.appendChild(rand);
         });
