@@ -12,15 +12,19 @@ app.use(express.json());
 
 // Configurăm conexiunea la baza de date MySQL
 // ATENȚIE: Aici va trebui să modifici cu datele tale reale!
-const db = mysql.createConnection({
-   host: process.env.DB_HOST,
+const db = mysql.createPool({
+    host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
     database: process.env.DB_NAME,
     ssl: {
-        rejectUnauthorized: false // Necesită o conexiune securizată (obligatoriu pentru Aiven)
-    } 
+        rejectUnauthorized: false
+    },
+    // Setări speciale pentru Vercel: menține un bazin de conexiuni flexibil
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
 // Verificăm dacă ne-am conectat cu succes la MySQL
