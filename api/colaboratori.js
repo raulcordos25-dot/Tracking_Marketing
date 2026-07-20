@@ -62,9 +62,12 @@ app.post('/', (req, res) => {
         // Returnăm și mesajul tehnic detaliat (eroare.message) către browser
         return res.status(500).json({ 
             mesaj: "Eroare la salvarea în baza de date",
-            detalii_tehnice: eroare.message
+            detalii_tehnice: eroare.message 
+        });
         }
+        
         console.log('Un nou colaborator a fost adăugat cu succes!');
+        // Trimitem confirmarea de succes către browser
         res.status(200).json({ mesaj: "Colaboratorul a fost salvat cu succes!" });
     });
 });
