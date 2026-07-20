@@ -73,14 +73,29 @@ async function incarcaColaboratori() {
             const clasaContactat = colab.contactat ? 'bg-success' : 'bg-secondary';
             
             // Dacă avem o dată pentru reminder, o facem să arate frumos
-            let dataReminderFormatata = '-';
-            if (colab.reminder_feedback) {
-                const dataObj = new Date(colab.reminder_feedback);
-                dataReminderFormatata = dataObj.toLocaleDateString('ro-RO');
-            }
+            // Dacă avem o dată pentru reminder, o formatăm și verificăm statusul ei
+let dataReminderFormatata = '-';
+let clasaCuloareData = ''; // Variabilă pentru culoarea de fundal a celulei
 
-            // Introducem structura HTML exactă în rândul nostru
-           // Introducem structura HTML exactă în rândul nostru, cu  pentru fiecare coloană
+if (colab.reminder_feedback) {
+    const dataObj = new Date(colab.reminder_feedback);
+    dataReminderFormatata = dataObj.toLocaleDateString('ro-RO');
+
+    // Preluăm data de azi
+    const azi = new Date();
+    
+    // Resetăm orele la 00:00:00 pentru o comparație corectă strict pe zile
+    azi.setHours(0, 0, 0, 0);
+    const dataComparare = new Date(dataObj);
+    dataComparare.setHours(0, 0, 0, 0);
+
+    // Aplicăm regulile de culoare
+    if (dataComparare.getTime() === azi.getTime()) {
+        clasaCuloareData = 'table-warning text-dark fw-bold'; // Azi -> Galben
+    } else if (dataComparare.getTime() < azi.getTime()) {
+        clasaCuloareData = 'table-danger text-dark fw-bold'; // Trecut -> Roșu
+    }
+}
  rand.innerHTML = `
                 <td>${colab.nume}</td>
                 <td><span class="badge ${clasaContactat}">${textContactat}</span></td>
