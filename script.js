@@ -1,56 +1,38 @@
-// Localizăm formularul din HTML folosind ID-ul său unic
+// 1. Localizăm formularul și butonul din HTML
 const formular = document.getElementById('formularColaboratori');
+const butonSalvare = formular.querySelector('button[type="submit"]');
 
-// Ascultăm momentul în care utilizatorul dă click pe butonul de Salvare
-formular.addEventListener('submit', function(eveniment) {
-    // Prevenim comportamentul standard al paginii (reîncărcarea automată)
+// 2. Folosim "onsubmit" în loc de "addEventListener" pentru a garanta o execuție unică
+formular.onsubmit = async function(eveniment) {
+    // Oprim reîncărcarea paginii
     eveniment.preventDefault();
 
-    // Extragem valorile introduse de tine în fiecare câmp
-    const dateTrimise = {
-        nume: document.getElementById('nume').value,
-        dorinte: document.getElementById('dorinte').value,
-        // Proprietatea 'checked' ne returnează adevărat (true) sau fals (false) pentru bife
-        contactat: document.getElementById('contactat').checked, 
-        postari: document.getElementById('postari').value,
-        sdgProiect: document.getElementById('sdgProiect').value,
-        feedback: document.getElementById('feedback').value,
-        reminder: document.getElementById('reminder').value,
-        ideea: document.getElementById('ideea').value
-    };
+    // 3. DEZACTIVĂM butonul pe durata procesării pentru a preveni spam-ul/dublu-click-ul
+    butonSalvare.disabled = true;
+    butonSalvare.innerText = "Se salvează..."; // Oferim feedback vizual utilizatorului
 
-    // Pentru a verifica dacă totul funcționează, afișăm datele în consolă ca text organizat (JSON)
-   // Localizăm formularul din HTML
-const formular = document.getElementById('formularColaboratori');
-
-formular.addEventListener('submit', async function(eveniment) {
-    // Oprim reîncărcarea automată a paginii
-    eveniment.preventDefault();
-
-    // 1. Colectăm datele exact din id-urile din HTML-ul tău
+    // Colectăm datele
     const dateColaborator = {
         nume: document.getElementById('nume').value,
         sdgProiect: document.getElementById('sdgProiect').value,
         reminder: document.getElementById('reminder').value,
         postari: document.getElementById('postari').value,
         feedback: document.getElementById('feedback').value,
-        contactat: document.getElementById('contactat').checked, // returnează true/false
+        contactat: document.getElementById('contactat').checked,
         dorinte: document.getElementById('dorinte').value,
         ideea: document.getElementById('ideea').value
     };
 
     try {
-        // 2. Trimitem datele către server folosind funcția 'fetch'
-        // 'http://localhost:3000/api/colaboratori' este adresa viitorului nostru server Node.js
-       const raspuns = await fetch('/api/colaboratori', {
-            method: 'POST', // POST înseamnă că vrem să trimitem/creăm date noi
+        // Trimitem datele către serverul nostru de pe Vercel
+        const raspuns = await fetch('/api/colaboratori', {
+            method: 'POST',
             headers: {
-                'Content-Type': 'application/json' // Îi spunem serverului că îi trimitem date formatate ca JSON
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify(dateColaborator) // Transformăm obiectul nostru într-un text simplu pentru a fi trimis
+            body: JSON.stringify(dateColaborator)
         });
 
-        // 3. Verificăm dacă serverul ne-a dat undă verde
         if (raspuns.ok) {
             alert('Colaboratorul a fost salvat cu succes în baza de date!');
             formular.reset(); // Curățăm formularul pentru o nouă introducere
@@ -59,9 +41,12 @@ formular.addEventListener('submit', async function(eveniment) {
         }
 
     } catch (eroare) {
-        // Dacă serverul este oprit sau nu poate fi găsit, va intra aici
         console.error('Eroare de conexiune cu serverul:', eroare);
-        alert('Nu m-am putut conecta la server. Asigură-te că este pornit!');
+        alert('Nu m-am putut conecta la server.');
+    } finally {
+        // 4. Blocul "finally" se execută MEREU la final, indiferent dacă a fost succes sau eroare.
+        // Reactivăm butonul ca să poți adăuga un alt colaborator.
+        butonSalvare.disabled = false;
+        butonSalvare.innerText = "Salvează Colaboratorul";
     }
-});
-});
+};
