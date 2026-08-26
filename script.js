@@ -94,6 +94,7 @@ async function incarcaColaboratori() {
                 <td><span class="badge ${clasaContactat}">${textContactat}</span></td>
                 <td>${colab.sdg_proiect}</td>
                 <td>${colab.dorinte || '-'}</td>
+                <td>${colab.ideea_principala || '-'}</td>
                 <td>${colab.postari_publicate || '-'}</td>
                 <td>${colab.feedback_colaboratori || '-'}</td>
                 <td class="${clasaCuloareData}">${dataReminderFormatata}</td>
